@@ -29,7 +29,17 @@
                                 @endif
                             </td>
                             <td>{{ $produto->updated_at->format('d/m/Y H:i') }}</td>
+                            <td class="text-end">
+                                <a href="{{ route('produtos.edit', $produto) }}" class="btn btn-sm btn-outline-secondary">
+                                    Editar
+                                </a>
 
+                                <form action="{{ route('produtos.destroy', $produto) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger">Excluir</button>
+                                </form>
+                            </td>
                         </tr>
                     @empty
                         <tr><td colspan="4" class="text-center p-4 text-muted">Nenhuma categoria cadastrada.</td></tr>

@@ -2,9 +2,9 @@
 @section('title', 'Editar Categoria')
 @section('content')
     <h2 class="mb-3">Editar Categoria</h2>
-    <form action="{{ route('categorias.update', $categoria) }}" method="POST">
+    <form action="{{ route('produtos.update', $produto) }}" method="POST">
         @csrf
         @method('PUT')
-        @include('categorias._form', ['categoria' => $categoria])
+        @include('produtos._form', ['produto' => $produto])
     </form>
 @endsection

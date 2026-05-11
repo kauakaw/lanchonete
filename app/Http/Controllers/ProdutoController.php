@@ -26,7 +26,7 @@ class ProdutoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProdutoRequest $request)
     {
         $dados = $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
@@ -44,35 +44,28 @@ class ProdutoController extends Controller
             ->with('sucesso', 'Produto criado com sucesso!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Produto $produto)
     {
-        //
+        $categorias = Categoria::orderBy('nome')->get();
+        return view('produtos.edit', compact('produto', 'categorias'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(ProdutoRequest $request, Produto $produto)
     {
-        //
+        $dados = $request->validated();
+        $dados['ativa'] = $request->boolean('ativa');
+
+        $produto->update($dados);
+
+        return redirect()->route('produtos.index')
+            ->with('sucesso', 'Produto atualizado com sucesso!');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Produto $produto)
     {
-        //
-    }
+        $produto->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('produtos.index')
+            ->with('sucesso', 'Produto excluído com sucesso!');
     }
 }
