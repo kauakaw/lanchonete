@@ -8,6 +8,8 @@ class CategoriaController extends Controller
     {
         $categorias = Categoria::orderBy('nome')->get(); // Paginação entra no Cap. 4
         return view('categorias.index', compact('categorias'));
+
+
     }
 
     public function create()
