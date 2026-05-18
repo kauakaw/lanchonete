@@ -2,10 +2,19 @@
 @section('title', 'Categorias')
 @section('content')
     @include('partials.alerts')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Categorias</h2>
-        <a href="{{ route('categorias.create') }}" class="btn btn-sm btn-primary">Nova Categoria </a>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h2 class="mb-0">Categorias</h2>
+
+        <form method="GET" action="{{ route('categorias.index') }}" class="d-flex gap-2">
+            <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Buscar por nome...">
+            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+            <a class="btn btn-outline-secondary" href="{{ route('categorias.index') }}">Limpar</a>
+        </form>
+
+        <a class="btn btn-primary" href="{{ route('categorias.create') }}">Nova Categoria</a>
     </div>
+
     <div class="card">
         <div class="card-body p-0">
             <table class="table table-striped table-hover mb-0">
@@ -35,7 +44,8 @@
                                     Editar
                                 </a>
 
-                                <form action="{{ route('categorias.destroy', $categoria) }}" method="POST" class="d-inline">
+                                <form method="POST" action="{{ route('categorias.destroy', $categoria) }}" class="d-inline"
+                                    onsubmit="return confirm('Tem certeza que deseja excluir?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger">Excluir</button>
@@ -47,6 +57,10 @@
                     @endforelse
                 </tbody>
             </table>
+        
+            <div class="mt-3">
+                {{ $categorias->links() }}
+            </div>
         </div>
     </div>
 @endsection

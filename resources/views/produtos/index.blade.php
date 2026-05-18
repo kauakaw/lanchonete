@@ -14,6 +14,7 @@
                         <th>Nome</th>
                         <th>Ativa</th>
                         <th>Atualizado em</th>
+                        <th>Imagens</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
@@ -29,6 +30,15 @@
                                 @endif
                             </td>
                             <td>{{ $produto->updated_at->format('d/m/Y H:i') }}</td>
+                            <td>
+                                @if($produto->image)
+                                    <img src="{{ asset('storage/' . $produto->image) }}"
+                                        width="150"
+                                        class="img-thumbnail">
+                                @else
+                                    Sem imagem
+                                @endif
+                            </td>
                             <td class="text-end">
                                 <a href="{{ route('produtos.edit', $produto) }}" class="btn btn-sm btn-outline-secondary">
                                     Editar

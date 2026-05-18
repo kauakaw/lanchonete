@@ -45,7 +45,7 @@
     @enderror
 </div>
 
-<div class="mb-3">''
+<div class="mb-3">
     <label for="categoria_id" class="form-label">Categoria</label>
 
     <select name="categoria_id"
@@ -67,6 +67,24 @@
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 </div>
+
+ @csrf
+
+    <div class="mb-3">
+        <label for="image" class="form-label">Imagem</label>
+
+        <input type="file"
+               name="image"
+               id="image"
+               accept=".jpg,.jpeg,.png,.webp"
+               class="form-control @error('image') is-invalid @enderror">
+
+        @error('image')
+            <div class="invalid-feedback">
+                {{ $message }}
+            </div>
+        @enderror
+    </div>
 
 <div class="form-check form-switch mb-3">
     <input type="hidden" name="ativo" value="0">

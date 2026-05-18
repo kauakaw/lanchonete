@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CategoriaRequest extends FormRequest
+class ProdutoRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,7 +15,7 @@ class CategoriaRequest extends FormRequest
     public function rules(): array
     {
         // Se estiver editando, o model vem pela rota (route model binding)
-        $ProdutoId = $this->route('produto')?->id;
+        $produtosId = $this->route('produto')?->id;
 
         return [
             'nome' => [
@@ -26,6 +26,12 @@ class CategoriaRequest extends FormRequest
             ],
             'preco' =>  'numeric|min:0',
             'descricao' => 'nullable|string|max:500',
+            'categoria_id' => [
+                'required',
+                'integer',
+                'exists:categorias,id',
+            ],
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'ativa' => 'nullable|boolean',
         ];
     }
@@ -37,6 +43,7 @@ class CategoriaRequest extends FormRequest
             'nome.max' => 'O nome deve ter no máximo :max caracteres.',
             'nome.unique' => 'Já existe uma categoria com este nome.',
             'descricao.max' => 'A descrição deve ter no máximo :max caracteres.',
+            'preco.required' => 'Informe o preço do produto.',
         ];
     }
 }

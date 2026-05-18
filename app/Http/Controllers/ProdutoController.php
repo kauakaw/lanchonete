@@ -6,14 +6,31 @@ use App\Models\Produto;
 use App\Models\Categoria;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\ProdutoRequest;
 
 class ProdutoController extends Controller
 {
     
     public function index()
     {
-        $produtos = Produto::orderBy('nome')->get(); // Paginação entra no Cap. 4
-        return view('produtos.index', compact('produtos'));
+        $q = request('q');
+    $categoriaId = request('categoria_id');
+
+    $produtos = Produto::query()
+        ->with('categoria')
+        ->when($q, function ($query) use ($q) {
+            $query->where('nome', 'like', "%{$q}%");
+        })
+        ->when($categoriaId, function ($query) use ($categoriaId) {
+            $query->where('categoria_id', $categoriaId);
+        })
+        ->orderBy('nome')
+        ->paginate(10)
+        ->withQueryString();
+
+    $categorias = Categoria::orderBy('nome')->get();
+
+    return view('produtos.index', compact('produtos', 'categorias'));
     }
 
     
@@ -34,9 +51,21 @@ class ProdutoController extends Controller
             'descricao' => 'nullable|string|max:500',
             'preco' => 'required|numeric',
             'ativa' => 'nullable|boolean',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $dados['ativa'] = $request->boolean('ativa');
+
+        if ($request->hasFile('image')) {
+
+            $imagem = $request->file('image');
+
+            $nomeImagem = time() . '.' . $imagem->getClientOriginalExtension();
+
+            $imagem->move(public_path('img/produtos'), $nomeImagem);
+
+            $dados['image'] = $nomeImagem;
+        }
 
         Produto::create($dados);
 
