@@ -1,11 +1,19 @@
 @extends('layouts.app')
 @section('title', 'Produto')
 @section('content')
-    @include('partials.alerts')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Produtos</h2>
-        <a href="{{ route('produtos.create') }}" class="btn btn-sm btn-primary">Novo Produto</a>
-    </div>
+@include('partials.alerts')
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="mb-0">Produtos</h2>
+
+    <form method="GET" action="{{ route('produtos.index') }}" class="d-flex gap-2">
+        <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Buscar por nome...">
+        <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+        <a class="btn btn-outline-secondary" href="{{ route('produtos.index') }}">Limpar</a>
+    </form>
+
+    <a class="btn btn-primary" href="{{ route('produtos.create') }}">Novo produto</a>
+</div>
+
     <div class="card">
         <div class="card-body p-0">
             <table class="table table-striped table-hover mb-0">
@@ -44,7 +52,8 @@
                                     Editar
                                 </a>
 
-                                <form action="{{ route('produtos.destroy', $produto) }}" method="POST" class="d-inline">
+                                <form action="{{ route('produtos.destroy', $produto) }}" method="POST" class="d-inline"
+                                    onsubmit="return confirm('Tem certeza que deseja excluir?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger">Excluir</button>
@@ -52,8 +61,12 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="text-center p-4 text-muted">Nenhuma categoria cadastrada.</td></tr>
+                        <tr><td colspan="4" class="text-center p-4 text-muted">Nenhum produto cadastrado.</td></tr>
                     @endforelse
+
+                    <div class="mt-3">
+                    {{ $produtos->links() }}
+                </div>
                 </tbody>
             </table>
         </div>

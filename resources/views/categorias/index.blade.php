@@ -55,12 +55,12 @@
                     @empty
                         <tr><td colspan="4" class="text-center p-4 text-muted">Nenhuma categoria cadastrada.</td></tr>
                     @endforelse
+
+                    <div class="mt-3">
+                        {{ $categorias->links() }}
+                    </div>
                 </tbody>
             </table>
-        
-            <div class="mt-3">
-                {{ $categorias->links() }}
-            </div>
         </div>
     </div>
 @endsection

@@ -58,13 +58,10 @@ class ProdutoController extends Controller
 
         if ($request->hasFile('image')) {
 
-            $imagem = $request->file('image');
+            $path = $request->file('image')
+                ->store('produtos', 'public');
 
-            $nomeImagem = time() . '.' . $imagem->getClientOriginalExtension();
-
-            $imagem->move(public_path('img/produtos'), $nomeImagem);
-
-            $dados['image'] = $nomeImagem;
+            $dados['image'] = $path;
         }
 
         Produto::create($dados);
