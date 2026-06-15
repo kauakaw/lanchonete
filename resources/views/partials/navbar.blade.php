@@ -31,6 +31,9 @@
             </li>
         @endauth
 
+        @csrf
+        <button type="submit">Sair</button>
+
         <div class="collapse navbar-collapse" id="navbarConteudo">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">

@@ -15,12 +15,8 @@ Route::get('/contato', [ContatoController::class, 'index'])->name('contato');
 Route::resource('categorias', CategoriaController::class);
 Route::resource('produtos', ProdutoController::class);
 
-Route::middleware(['auth'])->group(function () {
-    Route::resource('categorias', CategoriaController::class)
-        ->middleware(function ($request, $next) {
-            abort_unless(auth()->user()->role === 'gerente', 403);
-            return $next($request);
-        });
+Route::middleware(['auth', 'gerente'])->group(function () {
+    Route::resource('categorias', CategoriaController::class);
 });
 
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.form')->middleware('guest');
@@ -29,7 +25,9 @@ Route::post('/register', [AuthController::class, 'register'])->name('register')-
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('guest');
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout')
+    ->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     Route::view('/dashboard', 'auth.dashboard')->name('dashboard');
