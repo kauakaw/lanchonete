@@ -44,6 +44,7 @@ class ProdutoRequest extends FormRequest
             'nome.unique' => 'Já existe uma categoria com este nome.',
             'descricao.max' => 'A descrição deve ter no máximo :max caracteres.',
             'preco.required' => 'Informe o preço do produto.',
+            'image.required' => 'cai poha',
         ];
     }
 }

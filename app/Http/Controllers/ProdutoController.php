@@ -78,12 +78,24 @@ class ProdutoController extends Controller
 
     public function update(ProdutoRequest $request, Produto $produto)
     {
+        
         $dados = $request->validated();
+
         $dados['ativa'] = $request->boolean('ativa');
 
+        if ($request->hasFile('image')) {
+
+            $path = $request->file('image')
+                ->store('produtos', 'public');
+
+            $dados['image'] = $path;
+        }
+
+        dd($dados);
         $produto->update($dados);
 
-        return redirect()->route('produtos.index')
+        return redirect()
+            ->route('produtos.index')
             ->with('sucesso', 'Produto atualizado com sucesso!');
     }
 
