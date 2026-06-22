@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SobreController;
@@ -9,6 +10,13 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\AuthController;
 
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
+    
+Route::get('/dashboard', [AuthController::class, 'dashboard'])
+    ->name('dashboard');
+    
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sobre', [SobreController::class, 'index'])->name('sobre');
 Route::get('/contato', [ContatoController::class, 'index'])->name('contato');

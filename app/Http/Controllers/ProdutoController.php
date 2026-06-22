@@ -24,7 +24,7 @@ class ProdutoController extends Controller
         ->when($categoriaId, function ($query) use ($categoriaId) {
             $query->where('categoria_id', $categoriaId);
         })
-        ->orderBy('nome')
+        ->orderBy('preco', 'asc')
         ->paginate(10)
         ->withQueryString();
 
@@ -43,6 +43,7 @@ class ProdutoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    
     public function store(ProdutoRequest $request)
     {
         $dados = $request->validate([
@@ -50,11 +51,12 @@ class ProdutoController extends Controller
             'nome' => 'required|string|max:100|unique:produtos,nome',
             'descricao' => 'nullable|string|max:500',
             'preco' => 'required|numeric',
-            'ativa' => 'nullable|boolean',
+            'ativo' => 'nullable|boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $dados['ativa'] = $request->boolean('ativa');
+        $dados['ativo'] = $request->has('ativo');
+        unset($dados['ativa']);
 
         if ($request->hasFile('image')) {
 
@@ -78,20 +80,17 @@ class ProdutoController extends Controller
 
     public function update(ProdutoRequest $request, Produto $produto)
     {
-        
         $dados = $request->validated();
 
-        $dados['ativa'] = $request->boolean('ativa');
+        // ativa
+        $dados['ativo'] = $request->boolean('ativo');
 
         if ($request->hasFile('image')) {
-
-            $path = $request->file('image')
-                ->store('produtos', 'public');
-
-            $dados['image'] = $path;
+            $dados['image'] = $request->file('image')->store('produtos', 'public');
+        } else {
+            unset($dados['image']); // evita validação inútil
         }
 
-        dd($dados);
         $produto->update($dados);
 
         return redirect()

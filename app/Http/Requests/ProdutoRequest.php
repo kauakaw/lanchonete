@@ -32,7 +32,7 @@ class ProdutoRequest extends FormRequest
                 'exists:categorias,id',
             ],
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'ativa' => 'nullable|boolean',
+            'ativo' => 'nullable|boolean',
         ];
     }
 
