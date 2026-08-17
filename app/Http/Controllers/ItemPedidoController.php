@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class Controller
+class ItemPedidoController extends Controller
 {
+    //
 }
