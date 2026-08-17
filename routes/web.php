@@ -9,6 +9,16 @@ use App\Http\Controllers\ContatoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\ItemPedidoController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('pedidos', PedidoController::class);
+
+    // rotas para itens de um pedido
+    Route::post('pedidos/{pedido}/itens', [ItemPedidoController::class, 'store'])->name('pedidos.itens.store');
+    Route::delete('pedidos/{pedido}/itens/{itemPedido}', [ItemPedidoController::class, 'destroy'])->name('pedidos.itens.destroy');
+});
 
 
 Route::post('/logout', [AuthController::class, 'logout'])

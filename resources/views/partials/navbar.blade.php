@@ -32,9 +32,11 @@
                             <a class="nav-link" href="#cardapio">Cardápio</a>
                         </li>
 
+                        
                         <li class="nav-item">
-                            <a class="nav-link" href="#pedidos">Pedidos</a>
+                            <a class="nav-link" href="{{ route('pedidos.index') }}">Pedidos</a>
                         </li>
+                    
 
                         <li class="nav-item">
                             <a class="nav-link" href="contato">Contato</a>
