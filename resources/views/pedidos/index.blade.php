@@ -20,21 +20,23 @@
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($pedidos as $p)
-                        <tr>
-                            <td>{{ $p->id }}</td>
-                            <td>{{ $p->user->name ?? '—' }}</td>
-                            <td>{{ $p->status }}</td>
-                            <td class="text-end">R$ {{ number_format($p->total, 2, ',', '.') }}</td>
-                            <td class="text-end">
-                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('pedidos.edit', $p) }}">Abrir</a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="text-center p-4 text-muted">Nenhum pedido.</td></tr>
-                    @endforelse
+                <tbody id="itensBody">
+                @foreach($pedido->itens as $item)
+                    <tr id="item-{{ $item->id }}">
+                    <td>{{ $item->produto->nome }}</td>
+                    <td class="text-end">{{ $item->quantidade }}</td>
+                    <td class="text-end">R$ {{ number_format($item->preco_unitario,2,',','.') }}</td>
+                    <td class="text-end">R$ {{ number_format($item->subtotal,2,',','.') }}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger" data-remove="{{ $item->id }}">Remover</button>
+                    </td>
+                    </tr>
+                @endforeach
                 </tbody>
+
+                <div class="fw-bold">Total: <span id="pedidoTotal">R$ {{ number_format($pedido->total,2,',','.') }}
+                </span>
+            </div>
             </table>
         </div>
     </div>
