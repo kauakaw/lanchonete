@@ -21,16 +21,15 @@
                     </tr>
                 </thead>
                 <tbody id="itensBody">
-                @foreach($pedido->itens as $item)
-                    <tr id="item-{{ $item->id }}">
-                    <td>{{ $item->produto->nome }}</td>
-                    <td class="text-end">{{ $item->quantidade }}</td>
-                    <td class="text-end">R$ {{ number_format($item->preco_unitario,2,',','.') }}</td>
-                    <td class="text-end">R$ {{ number_format($item->subtotal,2,',','.') }}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-danger" data-remove="{{ $item->id }}">Remover</button>
-                    </td>
-                    </tr>
+                @foreach($pedidos as $pedido)
+                    @foreach($pedido->itens as $item)
+                        <tr>
+                            <td>{{ $item->produto->nome }}</td>
+                            <td>{{ $item->quantidade }}</td>
+                            <td>R$ {{ number_format($item->preco_unitario, 2, ',', '.') }}</td>
+                            <td>R$ {{ number_format($item->subtotal, 2, ',', '.') }}</td>
+                        </tr>
+                    @endforeach
                 @endforeach
                 </tbody>
 

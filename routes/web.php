@@ -12,12 +12,17 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ItemPedidoController;
 
+
+Route::post('pedidos/{pedido}/itens-json', [ItemPedidoController::class, 'storeJson'])
+    ->name('pedidos.itens.storeJson');
+
+Route::delete('pedidos/{pedido}/itens-json/{itemPedido}', [ItemPedidoController::class, 'destroyJson'])
+    ->name('pedidos.itens.destroyJson');
+
 Route::middleware(['auth'])->group(function () {
     Route::resource('pedidos', PedidoController::class);
 
-    // rotas para itens de um pedido
-    Route::post('pedidos/{pedido}/itens', [ItemPedidoController::class, 'store'])->name('pedidos.itens.store');
-    Route::delete('pedidos/{pedido}/itens/{itemPedido}', [ItemPedidoController::class, 'destroy'])->name('pedidos.itens.destroy');
+
 });
 
 

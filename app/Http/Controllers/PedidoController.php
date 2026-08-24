@@ -9,7 +9,7 @@ class PedidoController extends Controller
 {
     public function index()
     {
-        $pedidos = Pedido::with('user')
+        $pedidos = Pedido::with(['user', 'itens.produto'])
             ->orderByDesc('id')
             ->paginate(10);
 

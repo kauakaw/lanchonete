@@ -13,7 +13,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="fw-bold">Adicionar item</h5>
-                    <form method="POST" action="{{ route('pedidos.itens.store', $pedido) }}">
+                    <form id="formAddItem">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Produto</label>
@@ -28,8 +28,16 @@
                             <label class="form-label">Quantidade</label>
                             <input type="number" name="quantidade" class="form-control" value="1" min="1" max="99" required>
                         </div>
-                        <button class="btn btn-primary">Adicionar</button>
+                        <button class="btn btn-primary" type="submit">Adicionar (AJAX)</button>
                     </form>
+
+                    <script>
+                      window.PW3 = {
+                        pedidoId: {{ $pedido->id }},
+                        urlAdd: "{{ route('pedidos.itens.storeJson', $pedido) }}",
+                        urlDelBase: "{{ url('pedidos/'.$pedido->id.'/itens-json') }}"
+                      };
+                    </script>
                 </div>
             </div>
         </div>
@@ -49,25 +57,21 @@
                                 <th class="text-end">Ações</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @forelse($pedido->itens as $item)
-                                <tr>
-                                    <td>{{ $item->produto->nome ?? '—' }}</td>
-                                    <td class="text-end">{{ $item->quantidade }}</td>
-                                    <td class="text-end">R$ {{ number_format($item->preco_unitario,2,',','.') }}</td>
-                                    <td class="text-end">R$ {{ number_format($item->subtotal,2,',','.') }}</td>
-                                    <td class="text-end">
-                                        <form method="POST" action="{{ route('pedidos.itens.destroy', [$pedido, $item]) }}" class="d-inline"
-                                              onsubmit="return confirm('Remover este item?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-outline-danger">Remover</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="5" class="text-center text-muted p-3">Nenhum item ainda.</td></tr>
-                            @endforelse
+                        <tbody id="itensBody">
+  @foreach($pedido->itens as $item)
+    <tr id="item-{{ $item->id }}">
+      <td>{{ $item->produto->nome }}</td>
+      <td class="text-end">{{ $item->quantidade }}</td>
+      <td class="text-end">R$ {{ number_format($item->preco_unitario,2,',','.') }}</td>
+      <td class="text-end">R$ {{ number_format($item->subtotal,2,',','.') }}</td>
+      <td class="text-end">
+        <button class="btn btn-sm btn-outline-danger" data-remove="{{ $item->id }}">Remover</button>
+      </td>
+    </tr>
+  @endforeach
+</tbody>
+
+<div class="fw-bold">Total: <span id="pedidoTotal">R$ {{ number_format($pedido->total,2,',','.') }}</span></div>
                         </tbody>
                     </table>
 
@@ -79,4 +83,125 @@
             </div>
         </div>
     </div>
+    function csrfToken() {
+  return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
+
+function moneyBR(value) {
+  return (value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function showToast(title, body) {
+  const el = document.getElementById('pw3Toast');
+  document.getElementById('pw3ToastTitle').textContent = title;
+  document.getElementById('pw3ToastBody').textContent = body;
+  const toast = bootstrap.Toast.getOrCreateInstance(el, { delay: 2500 });
+  toast.show();
+}
+
+function upsertRow(item) {
+  const tbody = document.getElementById('itensBody');
+  let row = document.getElementById('item-' + item.id);
+
+  const html = `
+    <tr id="item-${item.id}">
+      <td>${item.produto.nome}</td>
+      <td class="text-end">${item.quantidade}</td>
+      <td class="text-end">${moneyBR(item.preco_unitario)}</td>
+      <td class="text-end">${moneyBR(item.subtotal)}</td>
+      <td class="text-end">
+        <button class="btn btn-sm btn-outline-danger" data-remove="${item.id}">Remover</button>
+      </td>
+    </tr>`;
+
+  if (row) {
+    row.outerHTML = html;
+  } else {
+    tbody.insertAdjacentHTML('beforeend', html);
+  }
+}
+
+function removeRow(itemId) {
+  const row = document.getElementById('item-' + itemId);
+  if (row) row.remove();
+}
+
+function setTotal(total) {
+  document.getElementById('pedidoTotal').textContent = moneyBR(total);
+}
+
+document.getElementById('formAddItem').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const fd = new FormData(form);
+
+  try {
+    const resp = await fetch(window.PW3.urlAdd, {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken(),
+        'Accept': 'application/json'
+      },
+      body: fd
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      // 422 validação vem com errors
+      const msg = data.message || 'Erro ao adicionar item.';
+      showToast('Erro', msg);
+      console.error(data);
+      return;
+    }
+
+    upsertRow(data.item);
+    setTotal(data.pedido.total);
+    showToast('Sucesso', data.message);
+
+    // reset rápido
+    form.quantidade.value = 1;
+    form.produto_id.value = '';
+
+  } catch (err) {
+    console.error(err);
+    showToast('Erro', 'Falha de conexão. Verifique servidor e console.');
+  }
+});
+
+// Delegação de evento para botões remover
+document.getElementById('itensBody').addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-remove]');
+  if (!btn) return;
+
+  const itemId = btn.getAttribute('data-remove');
+  if (!confirm('Remover este item?')) return;
+
+  try {
+    const resp = await fetch(`${window.PW3.urlDelBase}/${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken(),
+        'Accept': 'application/json'
+      }
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      showToast('Erro', data.message || 'Erro ao remover.');
+      console.error(data);
+      return;
+    }
+
+    removeRow(data.removed_item_id);
+    setTotal(data.pedido.total);
+    showToast('Sucesso', data.message);
+
+  } catch (err) {
+    console.error(err);
+    showToast('Erro', 'Falha de conexão.');
+  }
+});
 @endsection
